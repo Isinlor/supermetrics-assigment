@@ -34,7 +34,11 @@ class AveragePostsPerUser extends AbstractCalculator
      */
     protected function doCalculate(): StatisticsTo
     {
-        $value = array_sum($this->postCountsPerUser) / count($this->postCountsPerUser);
+        if(count($this->postCountsPerUser) > 0) {
+            $value = array_sum($this->postCountsPerUser) / count($this->postCountsPerUser);
+        } else {
+            $value = 0;
+        }
 
         // TODO: precision seems like a display consideration - why precision 2 is expected?
         return (new StatisticsTo())->setValue(round($value,2));
