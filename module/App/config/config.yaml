@@ -1,0 +1,42 @@
+parameters:
+  routes:
+    '/'           : 'App\Controller\IndexController@indexAction'
+    '/404'        : 'App\Controller\ErrorController@notFoundAction'
+    '/statistics' : 'App\Controller\StatisticsController@indexAction'
+
+services:
+
+  _defaults:
+    public: true
+    autowire: true
+
+  App\:
+    resource: '../src/'
+    exclude:
+      - '../src/Kernel/AppKernel.php'
+
+  SocialPost\:
+    resource: '../../SocialPost/src/'
+    exclude:
+      - '../../SocialPost/src/**/Dto/*To.php'
+
+  Statistics\:
+    resource: '../../Statistics/src/'
+    exclude:
+      - '../../Statistics/src/**/Dto/*To.php'
+
+  Symfony\Component\DependencyInjection\ContainerInterface: '@service_container'
+
+  GuzzleHttp\Client:
+    arguments: [base_uri: '%env(FICTIONAL_SOCIAL_API_HOST)%']
+
+  SocialPost\Client\FictionalClient:
+    arguments:
+      $clientId: '%env(FICTIONAL_SOCIAL_API_CLIENT_ID)%'
+
+  SocialPost\Driver\FictionalDriver:
+    arguments:
+      $client: '@SocialPost\Client\FictionalClient'
+
+  SocialPost\Client\SocialClientCacheDecorator:
+    autowire: false

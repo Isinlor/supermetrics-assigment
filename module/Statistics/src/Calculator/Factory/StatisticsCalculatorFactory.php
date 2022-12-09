@@ -33,7 +33,7 @@ class StatisticsCalculatorFactory
      *
      * @return CalculatorInterface
      */
-    public static function create(array $parameters): CalculatorInterface
+    public function create(array $parameters): CalculatorInterface
     {
         $calculator = new CalculatorComposite();
 

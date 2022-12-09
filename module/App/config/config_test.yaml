@@ -1,0 +1,21 @@
+imports:
+  - { resource: config.yaml }
+
+parameters:
+  env(FICTIONAL_SOCIAL_API_HOST): 'https://api.supermetrics.com'
+  env(FICTIONAL_SOCIAL_API_CLIENT_ID): 'qwerty'
+
+services:
+
+  _defaults:
+    public: true
+    autowire: true
+
+  GuzzleHttp\Client:
+    arguments:
+      - {
+        base_uri: '%env(FICTIONAL_SOCIAL_API_HOST)%',
+        handler: '@GuzzleHttp\Handler\MockHandler'
+      }
+
+  GuzzleHttp\Handler\MockHandler:

@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use DateTime;
+use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use SocialPost\Service\SocialPostService;
 use Statistics\Builder\ParamsBuilder;
 use Statistics\Enum\StatsEnum;
@@ -56,10 +58,7 @@ class StatisticsController extends Controller
         $this->extractor     = $extractor;
     }
 
-    /**
-     * @param array $params
-     */
-    public function indexAction(array $params)
+    public function indexAction(array $params): ResponseInterface
     {
         try {
             $date   = $this->extractDate($params);
@@ -72,12 +71,11 @@ class StatisticsController extends Controller
                 'stats' => $this->extractor->extract($stats, self::STAT_LABELS),
             ];
         } catch (\Throwable $throwable) {
-            http_response_code(500);
-
-            $response = ['message' => 'An error occurred'];
+            return $this->renderJson(['message' => 'An error occurred'], 500);
         }
 
-        $this->render($response, 'json', false);
+        return $this->renderJson($response);
+
     }
 
     /**
