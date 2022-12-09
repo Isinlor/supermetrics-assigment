@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Calculator;
+namespace Tests\Statistics\Calculator;
 
 use DateTime;
 use PHPUnit\Framework\TestCase;

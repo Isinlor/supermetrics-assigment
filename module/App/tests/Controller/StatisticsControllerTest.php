@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Calculator;
+namespace Tests\App\Controller;
 
 use PHPUnit\Framework\TestCase;
 
