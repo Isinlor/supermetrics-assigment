@@ -28,7 +28,9 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\App\\": "module/App/tests",
+            "Tests\\Statistics\\": "module/Statistics/tests",
+            "Tests\\SocialPost\\": "module/SocialPost/tests"
         }
     },
     "scripts": {
