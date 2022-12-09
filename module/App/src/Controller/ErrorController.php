@@ -12,6 +12,6 @@ class ErrorController extends Controller
 
     public function notFoundAction()
     {
-        $this->render(['message' => 'Page not found'], 'error');
+        return $this->render('error', ['message' => 'Page not found']);
     }
 }

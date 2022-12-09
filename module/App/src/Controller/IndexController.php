@@ -19,6 +19,6 @@ class IndexController extends Controller
             $date->modify('-1 month');
         }
 
-        $this->render(['options' => $options], 'homepage');
+        return $this->render('homepage', ['options' => $options]);
     }
 }

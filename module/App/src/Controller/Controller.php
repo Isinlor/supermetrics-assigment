@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
+
 /**
  * Class Controller
  *
@@ -10,13 +13,9 @@ namespace App\Controller;
 abstract class Controller implements ControllerInterface
 {
 
-    /**
-     * @param array  $vars
-     * @param string $template
-     * @param bool   $useLayout
-     */
-    public function render(array $vars, string $template, $useLayout = true)
+    public function render(string $template, array $vars, int $status = 200, array $headers = [], bool $useLayout = true): ResponseInterface
     {
+        ob_start();
         $templateFile = sprintf(__DIR__ . '/../../view/%s.phtml', $template);
         if (!file_exists($templateFile)) {
             throw new \RuntimeException(sprintf('Template %s not found', $template));
@@ -28,10 +27,16 @@ abstract class Controller implements ControllerInterface
 
         if (true === $useLayout) {
             include __DIR__ . '/../../view/layout.phtml';
-
-            return;
+        } else {
+            include $content;
         }
 
-        include $content;
+        return new Response($status, $headers, ob_get_clean());
     }
+
+    public function renderJson(array $vars, int $status = 200)
+    {
+        return $this->render('json', $vars, $status, ['Content-Type' => 'application/json'], false);
+    }
+
 }

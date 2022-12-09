@@ -2,9 +2,10 @@
 
 namespace App\Dispatcher;
 
-use App\Config\Config;
 use App\Controller\ControllerInterface;
-use App\Controller\Factory\ControllerFactoryInterface;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class RouteDispatcher
@@ -14,10 +15,16 @@ use App\Controller\Factory\ControllerFactoryInterface;
 class RouteDispatcher
 {
 
+    public function __construct(
+        private ContainerInterface $container
+    )
+    {
+    }
+
     /**
      * @param string $requestUri
      */
-    public static function dispatch(string $requestUri)
+    public function dispatch(string $requestUri): void
     {
         $parts = explode('?', $requestUri);
 
@@ -25,7 +32,7 @@ class RouteDispatcher
 
         parse_str($query, $params);
 
-        $routes = Config::get('routes');
+        $routes = $this->container->getParameter('routes');
         if (!array_key_exists($path, $routes)) {
             $path = '/404';
         }
@@ -33,9 +40,12 @@ class RouteDispatcher
         $parts = explode('@', $routes[$path]);
         list($controllerName, $action) = $parts;
 
-        $controller = static::locateController($controllerName);
+        $controller = $this->locateController($controllerName);
 
-        $controller->$action($params);
+        /** @var ResponseInterface $response */
+        $response = $controller->$action($params);
+
+        (new SapiEmitter())->emit($response);
     }
 
     /**
@@ -43,25 +53,11 @@ class RouteDispatcher
      *
      * @return ControllerInterface
      */
-    private static function locateController(string $name): ControllerInterface
+    private function locateController(string $name): ControllerInterface
     {
-        $config = Config::get('controllers');
-
-        if (in_array($name, $config['invokables'])) {
-            return new $name();
+        if(!$this->container->has($name)) {
+            throw new \RuntimeException(sprintf('Unable instantiate controller %s', $name));
         }
-
-        if (array_key_exists($name, $config['factories'])) {
-            $factoryClass = $config['factories'][$name];
-
-            $factory = new $factoryClass();
-            if (!$factory instanceof ControllerFactoryInterface) {
-                throw new \RuntimeException(sprintf('Wrong factory registered for %s', $name));
-            }
-
-            return $factory->create();
-        }
-
-        throw new \RuntimeException(sprintf('Unable instantiate controller %s', $name));
+        return $this->container->get($name);
     }
 }

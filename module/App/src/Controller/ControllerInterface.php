@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+
 /**
  * Interface ControllerInterface
  *
@@ -9,11 +11,5 @@ namespace App\Controller;
  */
 interface ControllerInterface
 {
-
-    /**
-     * @param array  $vars
-     * @param string $template
-     * @param bool   $useLayout
-     */
-    public function render(array $vars, string $template, $useLayout = true);
+    public function render(string $template, array $vars, int $status = 200, array $headers = [], bool $useLayout = true): ResponseInterface;
 }

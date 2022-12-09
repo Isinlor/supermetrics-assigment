@@ -1,15 +1,17 @@
 <?php
 
-use App\Dispatcher\RouteDispatcher;
+use App\Kernel\AppKernel;
 use Dotenv\Dotenv;
+use App\Dispatcher\RouteDispatcher;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 $dotEnv = Dotenv::createImmutable(__DIR__ . '/..');
 $dotEnv->load();
 
-\App\Config\Config::init();
+$kernel = new AppKernel('config.yaml');
 
-$requestUri = $_SERVER['REQUEST_URI'];
+/** @var RouteDispatcher $routeDispatcher */
+$routeDispatcher = $kernel->getContainer()->get(RouteDispatcher::class);
 
-RouteDispatcher::dispatch($requestUri);
+$routeDispatcher->dispatch($_SERVER['REQUEST_URI']);
